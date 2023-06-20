@@ -21,7 +21,7 @@ In a second step, these data analyses are to be made available to the Küblbeck 
 <br></br>
 
 ## Project Status
-Beginning
+Beginning / Basic EDA
 <br></br>
 
 ## Technologies
