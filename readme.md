@@ -29,6 +29,7 @@ This project is created with:
 - Python 3.10.0
 - PostgreSQL 15.2
 - Asana 6.7.23
+- GitHub 3.8.5
 - Git 2.39.2
 - Google Slides 
 <br></br>
