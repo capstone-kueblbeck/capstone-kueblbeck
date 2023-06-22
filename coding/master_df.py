@@ -76,13 +76,13 @@ def setup():
 
     df_master = df_master.merge(df_verkaeufe, how='left', on=['lfnr', 'artnr', 'index', 'beschreibung'])
 
-    df_master.columns = ['lfnr','lieferant', 'artnr', 'index', 'beschreibung', 'bestellkennzeichen',
-       'verp_einheit', 'stat_gruppe', 'ltz_vk_ges', 'basispreis',
-       'basispr_summe', 'gesamt_lager', 'wen_lager', 'ltz_vk_wen', 'rgb_lager',
-       'ltz_vk_rgb', 'amb_lager', 'ltz_vk_amb', 'cha_lager', 'ltz_vk_cha',
-       'str_lager', 'ltz_vk_str', 'pas_lager', 'ltz_vk_pas', 'lan_lager',
-       'ltz_vk_lan', 'müh_lager', 'ltz_vk_müh', 'ros_lager', 'ltz_vk_ros',
-        'gesamt_vk', 'wen_vk', 'rgb_vk', 'str_vk', 'pas_vk',
-       'amb_vk', 'cha_vk', 'lan_vk', 'müh_vk', 'ros_vk']
+    #df_master.columns = ['lfnr','lieferant', 'artnr', 'index', 'beschreibung', 'bestellkennzeichen',
+    #   'verp_einheit', 'stat_gruppe', 'ltz_vk_ges', 'basispreis',
+    #   'basispr_summe', 'gesamt_lager', 'wen_lager', 'ltz_vk_wen', 'rgb_lager',
+    #   'ltz_vk_rgb', 'amb_lager', 'ltz_vk_amb', 'cha_lager', 'ltz_vk_cha',
+    #   'str_lager', 'ltz_vk_str', 'pas_lager', 'ltz_vk_pas', 'lan_lager',
+    #   'ltz_vk_lan', 'müh_lager', 'ltz_vk_müh', 'ros_lager', 'ltz_vk_ros',
+    #    'gesamt_vk', 'wen_vk', 'rgb_vk', 'str_vk', 'pas_vk',
+    #   'amb_vk', 'cha_vk', 'lan_vk', 'müh_vk', 'ros_vk']
     
     return df_master
