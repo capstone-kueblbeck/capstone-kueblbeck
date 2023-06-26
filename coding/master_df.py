@@ -11,7 +11,7 @@ def setup():
     schema = 'capstone_kueblbeck' # Schema in our Postgresql database
 
     # Other settings
-    pd.options.display.max_columns = 30
+    pd.options.display.max_columns = 40
     pd.options.display.float_format = "{:,.2f}".format
     
     #Loading Dataframes
@@ -48,8 +48,6 @@ def setup():
 
     df_lagerbestand = df_lagerbestand.rename(columns=new_columns)
 
-    df_lagerbestand['index'] = df_lagerbestand['index'].astype(int)
-
     # Adjust column names
     df_lieferanten.columns = df_lieferanten.columns.str.lower()
     df_lieferanten.columns = [col.replace(" ", "_") for col in df_lieferanten.columns.tolist()]
@@ -78,8 +76,6 @@ def setup():
 
     df_verkaeufe = df_verkaeufe.rename(columns=new_columns)
 
-    df_verkaeufe['index'] = df_verkaeufe['index'].astype(int)
-
     # Merging df_lagerbestand and df_lieferanten
     df_master = df_lagerbestand.merge(df_lieferanten, how='left', on='lfnr')
 
@@ -97,5 +93,9 @@ def setup():
        'amb_vk', 'cha_vk', 'lan_vk', 'müh_vk', 'ros_vk']
     
     df_master = df_master.reindex(columns = new_column_order)
+
+    # Drop columns that are not needed
+    df_master.drop(columns=['bestellkennzeichen', 'verp_einheit', 'stat_gruppe'], inplace=True)
+    
     
     return df_master
