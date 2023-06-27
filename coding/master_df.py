@@ -34,7 +34,7 @@ def setup():
                'bkz':'bestellkennzeichen',
                'vpe':'verp_einheit',
                'stgr':'stat_gruppe',
-               'basispreis':'basispreis_lager'
+               'basispreis':'basispreis_lager',
                'gesamt':'gesamt_lager',
                'wen':'wen_lager',
                'rgb':'rgb_lager',
