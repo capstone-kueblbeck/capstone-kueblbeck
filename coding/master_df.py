@@ -85,24 +85,31 @@ def setup():
     df_master = df_lagerbestand.merge(df_verkaeufe, how='outer', on=['lfnr', 'artnr', 'index', 'beschreibung']).fillna(0)
     df_master = df_master.drop_duplicates(['lfnr', 'artnr', 'index', 'beschreibung'])
 
+    # Checking maximum price from basispreis_lager and basispreis_vk and creating new column
+    df_master['basispreis'] = df_master[['basispreis_lager', 'basispreis_vk']].apply(max, axis=1)
+
+    # Calculating new inventory value with the new 'basispreis'
+    df_master['basispr_summe'] = df_master['basispreis'] * df_master['gesamt_lager']
+
     # Merging df_lieferanten on df_master
     df_master = df_master.merge(df_lieferanten, how='left', on='lfnr')
 
     # Adjusting column positions
 
-    new_column_order = ['lfnr','lieferant', 'artnr', 'beschreibung', 'index', 'bestellkennzeichen',
-         'verp_einheit', 'stat_gruppe', 'ltz_vk_ges', 'basispreis_lager', 'basispr_summe',
-         'basispreis_vk', 'gesamt_lager', 'wen_lager', 'ltz_vk_wen', 'rgb_lager',
-         'ltz_vk_rgb', 'amb_lager', 'ltz_vk_amb', 'cha_lager', 'ltz_vk_cha',
-         'str_lager', 'ltz_vk_str', 'pas_lager', 'ltz_vk_pas', 'lan_lager',
-         'ltz_vk_lan', 'müh_lager', 'ltz_vk_müh', 'ros_lager', 'ltz_vk_ros',
-         'gesamt_vk', 'wen_vk', 'rgb_vk', 'str_vk', 'pas_vk',
-         'amb_vk', 'cha_vk', 'lan_vk', 'müh_vk', 'ros_vk']
+    new_column_order = [
+        'lfnr','lieferant', 'artnr', 'beschreibung', 'index',
+        'basispreis', 'basispr_summe', 'gesamt_lager', 'ltz_vk_ges',
+        'wen_lager', 'ltz_vk_wen', 'rgb_lager', 'ltz_vk_rgb', 'amb_lager', 'ltz_vk_amb',
+        'cha_lager', 'ltz_vk_cha', 'str_lager', 'ltz_vk_str', 'pas_lager', 'ltz_vk_pas',
+        'lan_lager', 'ltz_vk_lan', 'müh_lager', 'ltz_vk_müh', 'ros_lager', 'ltz_vk_ros',
+        'gesamt_vk', 'wen_vk', 'rgb_vk', 'str_vk', 'pas_vk',
+        'amb_vk', 'cha_vk', 'lan_vk', 'müh_vk', 'ros_vk'
+        ]
 
     df_master = df_master.reindex(columns = new_column_order)
 
     # Drop columns that are not needed
-    df_master.drop(columns=['bestellkennzeichen', 'verp_einheit', 'stat_gruppe'], inplace=True)
+    #df_master.drop(columns=['bestellkennzeichen', 'verp_einheit', 'stat_gruppe', 'basispreis_lager', 'basispreis_vk'], inplace=True)
     
     
     return df_master
