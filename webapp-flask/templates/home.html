@@ -3,62 +3,44 @@
     <head>
         <link rel="icon" href="https://www.kueblbeck.de/wp-content/uploads/2021/10/favicon.png" sizes="32x32" />
         <title>Capstone-Projekt Küblbeck</title>
-        <style>
-            h1 {
-                font-size: 40px;
-                font-family:Arial, Helvetica, sans-serif;
-                font-weight: normal;
-                color: black;
-                text-align: center;
-            }
-
-            h2 {
-                font-size: 30px;
-                font-family: Arial, Helvetica, sans-serif;
-                font-weight: normal;
-                color:black;
-                text-align: center;
-            }
-
-            .bodytext {
-                font-family: Arial, Helvetica, sans-serif;
-                color: black;
-            }
-
-            #container {
-                max-width: 720px;
-                margin: 0 auto;
-            }
-        </style>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     </head>
     <body>
-        <div id="container">
-            <img id="logo" src="https://www.kueblbeck.de/wp-content/uploads/2021/10/kueblbeck_logo-2.png" >
-            <h1>Küblbeck Umlagerungsaufträge</h1>
-                <p class="bodytext">
+        <div class="container">
+            <img class="img-fluid" id="logo" src="https://www.kueblbeck.de/wp-content/uploads/2021/10/kueblbeck_logo-2.png" >
+            <h1 class="text-center mt-4 mt-4">Küblbeck Umlagerungsaufträge</h1>
+                <p class="lead">
                 Diese Web-App soll unser Schlüssel dafür sein, der Firma Küblbeck unser Python Script für Umlagerungsaufträge
                 in einer einfachen und zugänglichen Art zur Verfügung zu stellen.
                 Hoffentlich klappt das =)
                 </p>
-            <h2> Anleitung</h2>
-            <p class="bodytext">
+            <h2 class="text-center"> Anleitung</h2>
+            <p class="lead">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                 Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
                 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
                 Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             </p>
-            <h2>Inputs</h2>
-            <h3>Lagerbestand</h3>
-            <p class="bodytext">
-                TO-DO - Inputfeld für Lagerbestandsdateien einfügen
-            </p>
-            <h3>Verkäufe</h3>
-            <p class="bodytext">
-                TO-DO - Inputfeld für Verkaufsdateien einfügen
-            </p>
-            <div style="text-align: center; margin-top: 50px;">
-                <button>Just do it!</button>
-                <p> Copyright 2023, Team Capstone Küblbeck</p>
+            <h2 class="text-center">Inputs</h2>
+            <div class="text-center row">
+                <div class="col-6">
+                    <h3>Lagerbestand</h3>
+                    <p>
+                        TO-DO - Inputfeld für Lagerbestandsdateien einfügen
+                    </p>
+                </div>
+                <div class="col-6">
+                    <h3>Verkäufe</h3>
+                    <p>
+                        TO-DO - Inputfeld für Verkaufsdateien einfügen
+                    </p>
+                </div>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-primary btn-lg">Just do it!</button>
+                <p class="mt-4"> Copyright 2023, Team Capstone Küblbeck</p>
             </div>
         </div>
     </body>    
