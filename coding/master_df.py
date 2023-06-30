@@ -11,13 +11,12 @@ def setup():
     schema = 'capstone_kueblbeck' # Schema in our Postgresql database
 
     # Other settings
-    pd.options.display.max_columns = 30
+    pd.options.display.max_columns = 40
     pd.options.display.float_format = "{:,.2f}".format
     
     #Loading Dataframes
     sql_query = f'select * from {schema}.lagerbestand'
     df_lagerbestand = sf.get_dataframe(sql_query)
-
 
     sql_query = f'select * from {schema}.lieferanten'
     df_lieferanten = sf.get_dataframe(sql_query)
@@ -25,16 +24,17 @@ def setup():
     sql_query = f'select * from {schema}.verkäufe'
     df_verkaeufe = sf.get_dataframe(sql_query)
 
-    # Adjust column names
+    # Adjust column names - df_lagerbestand
     df_lagerbestand.columns = df_lagerbestand.columns.str.lower()
     df_lagerbestand.columns = [col.replace(" ", "_") for col in df_lagerbestand.columns.tolist()]
     df_lagerbestand.columns = [col.replace(".", "") for col in df_lagerbestand.columns.tolist()]
 
-    # Change names of selected columns
+    # Change names of selected columns - df_lagerbestand
     new_columns = {'beschr':'beschreibung',
                'bkz':'bestellkennzeichen',
                'vpe':'verp_einheit',
                'stgr':'stat_gruppe',
+               'basispreis':'basispreis_lager',
                'gesamt':'gesamt_lager',
                'wen':'wen_lager',
                'rgb':'rgb_lager',
@@ -48,16 +48,14 @@ def setup():
 
     df_lagerbestand = df_lagerbestand.rename(columns=new_columns)
 
-    df_lagerbestand['index'] = df_lagerbestand['index'].astype(int)
-
-    # Adjust column names
+    # Adjust column names - df_lieferanten
     df_lieferanten.columns = df_lieferanten.columns.str.lower()
     df_lieferanten.columns = [col.replace(" ", "_") for col in df_lieferanten.columns.tolist()]
     df_lieferanten.columns = [col.replace(".", "") for col in df_lieferanten.columns.tolist()]
 
     df_lieferanten = df_lieferanten.rename(columns={'beschreibung':'lieferant'})
 
-    # Adjust column names
+    # Adjust column names - df_verkaeufe
     df_verkaeufe.columns = df_verkaeufe.columns.str.lower()
     df_verkaeufe.columns = [col.replace(" ", "_") for col in df_verkaeufe.columns.tolist()]
     df_verkaeufe.columns = [col.replace(".", "") for col in df_verkaeufe.columns.tolist()]
@@ -65,6 +63,7 @@ def setup():
     # Change names of selected columns
     new_columns = {'lfr':'lfnr',
                'ind': 'index',
+               'wawi_artikeleinstandspreis_(fest)':'basispreis_vk',
                'gesamt':'gesamt_vk',
                'wen':'wen_vk',
                'rgb':'rgb_vk',
@@ -78,24 +77,39 @@ def setup():
 
     df_verkaeufe = df_verkaeufe.rename(columns=new_columns)
 
-    df_verkaeufe['index'] = df_verkaeufe['index'].astype(int)
+    # Filtering out unusable article numbers (due to formatting in source file) - df_verkaeufe
+    df_verkaeufe = df_verkaeufe[~df_verkaeufe['artnr'].str.contains('E\+')]
 
-    # Merging df_lagerbestand and df_lieferanten
-    df_master = df_lagerbestand.merge(df_lieferanten, how='left', on='lfnr')
+    # Merge df_verkaeufe on df_lagerbestand to create df_master and drop duplicates
+    # Outer merge due to having articles sold in 2022 that might be out of stock at the time of our inventory data (2023-06-03)
+    df_master = df_lagerbestand.merge(df_verkaeufe, how='outer', on=['lfnr', 'artnr', 'index', 'beschreibung']).fillna(0)
+    df_master = df_master.drop_duplicates(['lfnr', 'artnr', 'index', 'beschreibung'])
 
-    # Merging df_master with df_verkaeufe
-    df_master = df_master.merge(df_verkaeufe, how='left', on=['lfnr', 'artnr', 'index', 'beschreibung'])
+    # Checking maximum price from basispreis_lager and basispreis_vk and creating new column
+    df_master['basispreis'] = df_master[['basispreis_lager', 'basispreis_vk']].apply(max, axis=1)
 
-    # change order of columns
-    new_column_order = ['lfnr','lieferant', 'artnr', 'beschreibung', 'index', 'bestellkennzeichen',
-       'verp_einheit', 'stat_gruppe', 'ltz_vk_ges', 'basispreis',
-       'basispr_summe', 'gesamt_lager', 'wen_lager', 'ltz_vk_wen', 'rgb_lager',
-       'ltz_vk_rgb', 'amb_lager', 'ltz_vk_amb', 'cha_lager', 'ltz_vk_cha',
-       'str_lager', 'ltz_vk_str', 'pas_lager', 'ltz_vk_pas', 'lan_lager',
-       'ltz_vk_lan', 'müh_lager', 'ltz_vk_müh', 'ros_lager', 'ltz_vk_ros',
+    # Calculating new inventory value with the new 'basispreis'
+    df_master['basispr_summe'] = df_master['basispreis'] * df_master['gesamt_lager']
+
+    # Merging df_lieferanten on df_master
+    df_master = df_master.merge(df_lieferanten, how='left', on='lfnr')
+
+    # Adjusting column positions
+
+    new_column_order = [
+        'lfnr','lieferant', 'artnr', 'beschreibung', 'index',
+        'basispreis', 'basispr_summe', 'gesamt_lager', 'ltz_vk_ges',
+        'wen_lager', 'ltz_vk_wen', 'rgb_lager', 'ltz_vk_rgb', 'amb_lager', 'ltz_vk_amb',
+        'cha_lager', 'ltz_vk_cha', 'str_lager', 'ltz_vk_str', 'pas_lager', 'ltz_vk_pas',
+        'lan_lager', 'ltz_vk_lan', 'müh_lager', 'ltz_vk_müh', 'ros_lager', 'ltz_vk_ros',
         'gesamt_vk', 'wen_vk', 'rgb_vk', 'str_vk', 'pas_vk',
-       'amb_vk', 'cha_vk', 'lan_vk', 'müh_vk', 'ros_vk']
-    
+        'amb_vk', 'cha_vk', 'lan_vk', 'müh_vk', 'ros_vk'
+        ]
+
     df_master = df_master.reindex(columns = new_column_order)
+
+    # Drop columns that are not needed
+    #df_master.drop(columns=['bestellkennzeichen', 'verp_einheit', 'stat_gruppe', 'basispreis_lager', 'basispreis_vk'], inplace=True)
+    
     
     return df_master
