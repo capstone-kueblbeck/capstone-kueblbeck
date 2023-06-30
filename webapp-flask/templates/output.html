@@ -1,1 +1,19 @@
-Hallo! hier kommt bald der Output hin.
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="icon" href="https://www.kueblbeck.de/wp-content/uploads/2021/10/favicon.png" sizes="32x32" />
+        <title>Capstone-Projekt Küblbeck</title>
+        {% include 'bootstrap.html' %}
+    </head>
+    <body>
+        {% include 'navbar.html' %}
+        <div class="text-center">
+            <a href="/output" type ="button" class="btn btn-primary btn-lg mt-4">Hier kommt ein Download-Button hin</a>
+        </div>
+        <div class="container">
+            <h1 class="text-center mt-4" style="font-weight: normal;">Hier kommt der Output hin!</h1>
+        </div>
+        {% include 'vorschau.html' %}
+        {% include 'footer.html' %}
+    </body>
+</html>
