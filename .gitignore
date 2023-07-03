@@ -5,8 +5,8 @@ data/
 sql.py
 
 # Folders
-**/uploads
-**/output
+webapp-flask/uploads/
+webapp-flask/output/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
