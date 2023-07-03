@@ -8,12 +8,13 @@
     <body>
         {% include 'navbar.html' %}
         <div class="text-center">
-            <a href="/output" type ="button" class="btn btn-primary btn-lg mt-4">Hier kommt ein Download-Button hin</a>
+            <a href="{{ url_for('download') }}" class="btn btn-primary btn-lg mt-4">Download Excel</a>
         </div>
         <div class="container">
             <h1 class="text-center mt-4" style="font-weight: normal;">Hier kommt der Output hin!</h1>
         </div>
         {% include 'vorschau.html' %}
+
         {% include 'footer.html' %}
     </body>
 </html>
