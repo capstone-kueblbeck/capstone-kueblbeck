@@ -22,25 +22,27 @@
                 Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             </p>
             <h2 class="text-center">Inputs</h2>
-            <div class="text-center row">
-                <div class="col-1"></div>
-                <div class="col-5">
-                    <h3>Lagerbestand</h3>
-                    <p>Bitte Lagerbestandsdaten hochladen:</p>
-                    <label>Select a file:</label>
-                    <input type="file" name="lagerbestand"><br><br>
+            <form method="POST" action="" enctype="multipart/form-data">
+                <div class="text-center row">
+                    <div class="col-1"></div>
+                    <div class="col-5">
+                        <h3>Lagerbestand</h3>
+                        <p>Bitte Lagerbestandsdaten hochladen:</p>
+                        <label>Select a file:</label>
+                        <input type="file" name="lagerbestand"><br><br>
+                    </div>
+                    <div class="col-5">
+                        <h3>Verkäufe</h3>
+                        <p>Bitte Verkaufsdatei hochladen:</p>
+                        <label>Select a file:</label>
+                        <input type="file" name="verkaeufe"><br><br>
+                    </div>
+                    <div class="col-1"></div>
                 </div>
-                <div class="col-5">
-                    <h3>Verkäufe</h3>
-                    <p>Bitte Verkaufsdatei hochladen:</p>
-                    <label>Select a file:</label>
-                    <input type="file" name="verkaeufe"><br><br>
+                <div class="text-center" style="margin-bottom: 60px;">
+                    <button type="submit" class="btn btn-primary btn-lg">Just do it!</button>
                 </div>
-                <div class="col-1"></div>
-            </div>
-            <div class="text-center" style="margin-bottom: 60px;">
-                <a href="/output" type ="button" class="btn btn-primary btn-lg">Just do it!</a>
-            </div>
+            </form>            
         </div>
     {% include 'footer.html' %}
     </body>    

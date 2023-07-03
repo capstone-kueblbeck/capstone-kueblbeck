@@ -4,6 +4,10 @@ data/
 # connection details
 sql.py
 
+# Folders
+**/uploads
+**/output
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
