@@ -29,21 +29,22 @@
                         <h3>Lagerbestand</h3>
                         <p>Bitte Lagerbestandsdaten hochladen:</p>
                         <label>Select a file:</label>
-                        <input type="file" name="lagerbestand"><br><br>
+                        <input type="file" name="lagerbestand" id="lagerbestand-input" required><br><br>
                     </div>
                     <div class="col-5">
                         <h3>Verkäufe</h3>
                         <p>Bitte Verkaufsdatei hochladen:</p>
                         <label>Select a file:</label>
-                        <input type="file" name="verkaeufe"><br><br>
+                        <input type="file" name="verkaeufe" id="verkaeufe-input" required><br><br>
                     </div>
                     <div class="col-1"></div>
                 </div>
                 <div class="text-center" style="margin-bottom: 60px;">
-                    <button type="submit" class="btn btn-primary btn-lg">Just do it!</button>
+                    <button type="submit" id="submit-btn" class="btn btn-primary btn-lg" disabled>Just do it!</button>
                 </div>
             </form>            
         </div>
+    {% include 'javascript.html' %}
     {% include 'footer.html' %}
     </body>    
 </html>

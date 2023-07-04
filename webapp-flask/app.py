@@ -3,18 +3,28 @@ from master_df_app import setup
 import uuid
 import os
 import pandas as pd
-# import calculate_data - hier kommt das finale python-script hin
+import concurrent.futures
 
 app = Flask(__name__)
 UPLOADS_DIR = os.path.abspath('uploads')
 OUTPUT_DIR = os.path.abspath('output')
-df_master = None
+#df_master = None
 
 if not os.path.exists(UPLOADS_DIR):
     os.makedirs(UPLOADS_DIR)
 
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
+
+ALLOWED_EXTENSIONS = {'csv', 'txt', 'xls', 'xlsx'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_df_master():
+    output_pfad = 'output/output.xlsx'
+    df_master.to_excel(output_pfad, index=False)
 
 @app.route("/", methods=['GET', 'POST'])
 def home():
@@ -23,20 +33,20 @@ def home():
             lagerbestand = request.files['lagerbestand']
             verkaeufe = request.files['verkaeufe']
 
-            # lagerbestand_tempname = str(uuid.uuid4())
-            # verkaeufe_tempname = str(uuid.uuid4())
+            if allowed_file(lagerbestand.filename) and allowed_file(verkaeufe.filename):
+                lagerbestand_pfad = os.path.join(UPLOADS_DIR, 'lagerbestand.csv')
+                verkaeufe_pfad = os.path.join(UPLOADS_DIR, 'verkaeufe.csv')
+                lieferanten_pfad = 'inputs/Lieferantenübersicht.xlsx'
 
-            lagerbestand_pfad = os.path.join(UPLOADS_DIR, 'lagerbestand.csv')
-            verkaeufe_pfad = os.path.join(UPLOADS_DIR, 'verkaeufe.csv')
+                lagerbestand.save(lagerbestand_pfad)
+                verkaeufe.save(verkaeufe_pfad)
 
-            lagerbestand.save(lagerbestand_pfad)
-            verkaeufe.save(verkaeufe_pfad)
+                global df_master
+                df_master = setup(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad)
 
-            global df_master
-            #command = f'python master_df_app.py --lagerbestand {lagerbestand_pfad} --verkaeufe {verkaeufe_pfad}'
-            df_master = setup(lagerbestand_pfad, verkaeufe_pfad)
-
-            return redirect(url_for('output'))
+                return redirect(url_for('output'))
+            else:
+                return 'Ungültiges Dateiformat. Erlaubte Formate sind .csv, .txt, .xls und .xlsx.'
 
     return render_template('home.html')
 
@@ -56,11 +66,14 @@ def output():
 @app.route("/download")
 def download():
     global df_master
-    if df_master is None:
-        return redirect(url_for('home'))
+    # if df_master is None:
+    #     return redirect(url_for('home'))
     
-    output_pfad = 'output/output.csv'
-    df_master.to_csv(output_pfad, index=False)
+    output_pfad = 'output/output.xlsx'
+    # df_master.to_excel(output_pfad, index=False, sheet_name='Umlagerungen')
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.submit(save_df_master)
+    
     return send_file(output_pfad, as_attachment=True)
 
 if __name__ == '__main__':
