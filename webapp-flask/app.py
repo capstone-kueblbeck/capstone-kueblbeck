@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, send_file, redirect, url_for
 from master_df_app import setup
-import uuid
 import os
 import pandas as pd
-import concurrent.futures
+#import concurrent.futures
+import datetime
+# import openpyxl
+import math
 
 app = Flask(__name__)
 UPLOADS_DIR = os.path.abspath('uploads')
@@ -22,9 +24,40 @@ def allowed_file(filename):
     return '.' in filename and \
             filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def save_df_master():
-    output_pfad = 'output/output.xlsx'
-    df_master.to_excel(output_pfad, index=False)
+# def save_df_master():
+#     global output_pfad
+#     datum = datetime.date.today().strftime('%Y-%m-%d')
+#     output_pfad = f'output/Umlagerungen {datum}.xlsx'
+#     df_master.to_excel(output_pfad, index=False)
+
+def save_df_chunks(df, chunk_size, output_dir):
+    num_chunks = math.ceil(len(df) / (chunk_size))
+
+    for i in range(num_chunks):
+        start = i * chunk_size
+        end = (i + 1) * chunk_size
+        chunk = df[start:end]
+
+        temp_pfad = f'{output_dir}/output_chunk_{i}.csv'
+        chunk.to_csv(temp_pfad, index=False)
+
+def merge_csv_files(input_dir, output_file):
+    all_data = pd.DataFrame()
+
+    for file_name in os.listdir(input_dir):
+        if file_name.endswith('.csv'):
+            file_path = os.path.join(input_dir, file_name)
+
+            df_chunk = pd.read_csv(file_path)
+            all_data = all_data.append(df_chunk, ignore_index=True)
+
+    all_data.to_excel(output_file, index=False)
+
+    for file_name in os.listdir(input_dir):
+        file_path = os.path.join(input_dir, file_name)
+        os.remove(file_path)
+
+    os.rmdir(input_dir)
 
 @app.route("/", methods=['GET', 'POST'])
 def home():
@@ -65,15 +98,29 @@ def output():
 
 @app.route("/download")
 def download():
-    global df_master
-    # if df_master is None:
-    #     return redirect(url_for('home'))
-    
-    output_pfad = 'output/output.xlsx'
+    #global df_master
+    datum = datetime.date.today().strftime('%Y-%m-%d')
+    output_pfad = f'output/Umlagerungen {datum}.xlsx'
+
     # df_master.to_excel(output_pfad, index=False, sheet_name='Umlagerungen')
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.submit(save_df_master)
     
+    # with concurrent.futures.ThreadPoolExecutor() as executor:
+    #     executor.submit(save_df_master)
+
+    # with pd.ExcelWriter(output_pfad, engine='openpyxl') as writer:
+    #     writer.book = openpyxl.Workbook()
+    #     df_master.to_excel(writer, index=False)
+    #     writer.save
+
+    # df_master.to_excel(output_pfad, index=False, engine='xlsxwriter')
+
+    chunk_size = 50000
+    output_dir = 'output/temp'
+    os.makedirs(output_dir, exist_ok=True)
+    save_df_chunks(df_master, chunk_size, output_dir)
+
+    merge_csv_files(output_dir, output_pfad)
+
     return send_file(output_pfad, as_attachment=True)
 
 if __name__ == '__main__':

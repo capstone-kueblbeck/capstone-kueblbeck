@@ -62,9 +62,9 @@ def setup(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad):
     df_lieferanten = df_lieferanten.rename(columns={'beschreibung':'lieferant'})
     
     # Adjust datatypes where necessary - df_lagerbestand
-    date_columns = ["Ltz. VK ges.", "Ltz. VK WEN", "Ltz. VK RGB", "Ltz. VK AMB", "Ltz. VK CHA", "Ltz. VK STR", "Ltz. VK PAS", "Ltz. VK LAN", "Ltz. VK MÜH", "Ltz. VK ROS"]
-    for column in date_columns:
-        df_lagerbestand[column] = pd.to_datetime(df_lagerbestand[column], format='%d.%m.%Y', errors='coerce')
+    # date_columns = ["Ltz. VK ges.", "Ltz. VK WEN", "Ltz. VK RGB", "Ltz. VK AMB", "Ltz. VK CHA", "Ltz. VK STR", "Ltz. VK PAS", "Ltz. VK LAN", "Ltz. VK MÜH", "Ltz. VK ROS"]
+    # for column in date_columns:
+    #     df_lagerbestand[column] = pd.to_datetime(df_lagerbestand[column], format='%d.%m.%Y', errors='coerce')
     
     numeric_columns = ['Gesamt', 'WEN', 'RGB', 'AMB', 'CHA', 'STR', 'PAS', 'LAN', 'MÜH', 'ROS']
     for column in numeric_columns:
