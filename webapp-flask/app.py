@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, send_file, redirect, url_for
 from master_df_app import setup
+import sys
 import os
 import pandas as pd
 #import concurrent.futures
@@ -8,8 +9,13 @@ import datetime
 import math
 
 app = Flask(__name__)
-UPLOADS_DIR = os.path.abspath('uploads')
-OUTPUT_DIR = os.path.abspath('output')
+
+BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+UPLOADS_DIR = os.path.join(BASE_DIR, 'uploads')
+OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
+
+# UPLOADS_DIR = os.path.abspath('uploads')
+# OUTPUT_DIR = os.path.abspath('output')
 #df_master = None
 
 if not os.path.exists(UPLOADS_DIR):
