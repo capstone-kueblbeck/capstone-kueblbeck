@@ -1,7 +1,7 @@
 def read_dataframe(input_pfad):
     import pandas as pd
 
-    if input_pfad.endswith('csv') or input_pfad.endswith('txt'):
+    if input_pfad.endswith('.csv') or input_pfad.endswith('.txt'):
         with open(input_pfad, 'r') as file:
             first_line = file.readline()
             if ';' in first_line:
@@ -154,9 +154,8 @@ def visuals():
     import matplotlib.pyplot as plt
     import seaborn as sns
     import numpy as np
-    
-    # BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
-    # OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
+    from io import BytesIO
+    import base64
 
     # Visualization quality stock
     locations = {'gesamt': 'Gesamt', 
@@ -223,8 +222,13 @@ def visuals():
                 y += 1
                 z = 0
 
-    vis_path_1 = 'output/stock_quality.png'
-    fig1.savefig(vis_path_1)
+    # vis_path_1 = 'output/stock_quality.png'
+    # fig1.savefig(vis_path_1)
+
+    image_bytes1 = BytesIO()
+    fig1.savefig(image_bytes1, format='png')
+    image_bytes1.seek(0)
+    stock_quality = base64.b64encode(image_bytes1.getvalue()).decode('utf-8')
 
 
     # Visualization quality sales
@@ -281,7 +285,12 @@ def visuals():
                 y += 1
                 z = 0
 
-    vis_path_2 = 'output/sales_quality.png'
-    fig2.savefig(vis_path_2)
+    # vis_path_2 = 'output/sales_quality.png'
+    # fig2.savefig(vis_path_2)
 
-    return [vis_path_1, vis_path_2]
+    image_bytes2 = BytesIO()
+    fig2.savefig(image_bytes2, format='png')
+    image_bytes2.seek(0)
+    sales_quality = base64.b64encode(image_bytes2.getvalue()).decode('utf-8')
+
+    return stock_quality, sales_quality

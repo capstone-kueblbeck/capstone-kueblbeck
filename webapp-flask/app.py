@@ -8,13 +8,16 @@ import pandas as pd
 import datetime
 # import openpyxl
 import math
+import webview
 
-BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
-UPLOADS_DIR = os.path.join(BASE_DIR, 'uploads')
-OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
-INPUT_DIR = os.path.join(BASE_DIR, 'inputs')
+app = Flask(__name__)
+window = webview.create_window('Küblbeck Umlagerungen', app, fullscreen=True, confirm_close=True) # create webview by opening window
 
-app = Flask(__name__, static_folder = OUTPUT_DIR)
+# BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
+UPLOADS_DIR = os.path.join(BASE_DIR, 'temp/uploads')
+OUTPUT_DIR = os.path.join(BASE_DIR, 'temp/output')
+#INPUT_DIR = os.path.join(BASE_DIR, 'temp/inputs')
 
 if not os.path.exists(UPLOADS_DIR):
     os.makedirs(UPLOADS_DIR)
@@ -66,17 +69,19 @@ def merge_csv_files(input_dir, output_file):
 @app.route("/", methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
-        if 'lagerbestand' in request.files and 'verkaeufe' in request.files:
+        if 'lagerbestand' in request.files and 'verkaeufe' in request.files and 'lieferanten' in request.files:
             lagerbestand = request.files['lagerbestand']
             verkaeufe = request.files['verkaeufe']
+            lieferanten = request.files['lieferanten']
 
-            if allowed_file(lagerbestand.filename) and allowed_file(verkaeufe.filename):
-                lagerbestand_pfad = os.path.join(UPLOADS_DIR, 'lagerbestand.csv')
-                verkaeufe_pfad = os.path.join(UPLOADS_DIR, 'verkaeufe.csv')
-                lieferanten_pfad = os.path.join(INPUT_DIR, 'Lieferantenübersicht.xlsx')
+            if allowed_file(lagerbestand.filename) and allowed_file(verkaeufe.filename) and allowed_file(lieferanten.filename):
+                lagerbestand_pfad = os.path.join(UPLOADS_DIR, lagerbestand.filename)
+                verkaeufe_pfad = os.path.join(UPLOADS_DIR, verkaeufe.filename)
+                lieferanten_pfad = os.path.join(UPLOADS_DIR, lieferanten.filename)
 
                 lagerbestand.save(lagerbestand_pfad)
                 verkaeufe.save(verkaeufe_pfad)
+                lieferanten.save(lieferanten_pfad)
 
                 global df_master
                 df_master = setup(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad)
@@ -87,25 +92,15 @@ def home():
 
     return render_template('home.html')
 
-# How-to Daten an Flask senden??
-# Wie werden DAten empfangen in Flask?
-# app output verändern, so dass dort die DAten an output weitergegeben werden (Jinja2 Templates)
-
 @app.route("/output")
 def output():
-    # get input from index.html (csv)
-    # process csv file über calculate_data(csv)
-    # data = calculate_data(csv)
-    # template = create_html_template_with_data
-    # return render_template(template)
-    vis_paths = visuals()
-    return render_template('output.html', vis_paths=vis_paths)
+    stock_quality, sales_quality = visuals()
+    return render_template('output.html', stock_quality=stock_quality, sales_quality=sales_quality)
 
 @app.route("/download")
 def download():
-    #global df_master
     datum = datetime.date.today().strftime('%Y-%m-%d')
-    output_pfad = f'output/Umlagerungen {datum}.xlsx'
+    output_pfad = os.path.join(OUTPUT_DIR, f'Umlagerungen {datum}.xlsx')
 
     # df_master.to_excel(output_pfad, index=False, sheet_name='Umlagerungen')
     
@@ -124,10 +119,10 @@ def download():
     os.makedirs(output_dir, exist_ok=True)
     save_df_chunks(df_master, chunk_size, output_dir)
 
-    # merge_csv_files(output_dir, output_pfad)
     merge_csv_files(output_dir, output_pfad)
 
     return send_file(output_pfad, as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", debug=True)
+    webview.start(debug=True) # run webview in window mode
+    #app.run(host="0.0.0.0", debug=True)
