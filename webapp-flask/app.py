@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, send_file, redirect, url_for
 from master_df_app import setup
+from master_df_app import visuals
 import sys
 import os
 import pandas as pd
@@ -8,16 +9,12 @@ import datetime
 # import openpyxl
 import math
 
-app = Flask(__name__)
-
 BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
 UPLOADS_DIR = os.path.join(BASE_DIR, 'uploads')
 OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
 INPUT_DIR = os.path.join(BASE_DIR, 'inputs')
 
-# UPLOADS_DIR = os.path.abspath('uploads')
-# OUTPUT_DIR = os.path.abspath('output')
-#df_master = None
+app = Flask(__name__, static_folder = OUTPUT_DIR)
 
 if not os.path.exists(UPLOADS_DIR):
     os.makedirs(UPLOADS_DIR)
@@ -101,7 +98,8 @@ def output():
     # data = calculate_data(csv)
     # template = create_html_template_with_data
     # return render_template(template)
-    return render_template('output.html')
+    vis_paths = visuals()
+    return render_template('output.html', vis_paths=vis_paths)
 
 @app.route("/download")
 def download():
@@ -126,6 +124,7 @@ def download():
     os.makedirs(output_dir, exist_ok=True)
     save_df_chunks(df_master, chunk_size, output_dir)
 
+    # merge_csv_files(output_dir, output_pfad)
     merge_csv_files(output_dir, output_pfad)
 
     return send_file(output_pfad, as_attachment=True)

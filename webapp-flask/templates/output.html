@@ -7,14 +7,12 @@
     </head>
     <body>
         {% include 'navbar.html' %}
-        <div class="text-center">
+        <div class="text-center mb-4">
             <a href="{{ url_for('download') }}" class="btn btn-primary btn-lg mt-4">Download Liste</a>
         </div>
         <div class="container">
-            <h1 class="text-center mt-4" style="font-weight: normal;">Hier kommt der Output hin!</h1>
+            {% include 'visualisierungen.html' %}
         </div>
-        {% include 'vorschau.html' %}
-
         {% include 'footer.html' %}
     </body>
 </html>
