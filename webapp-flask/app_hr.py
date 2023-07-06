@@ -125,8 +125,9 @@ def download():
 
     chunk_size = 50000
     output_dir = 'output/temp'
-    os.makedirs(output_dir, exist_ok=True)
-    save_df_chunks(df_master, chunk_size, output_dir)
+    temp_dir = os.path.join(OUTPUT_DIR, 'temp')
+    os.makedirs(temp_dir, exist_ok=True)
+    save_df_chunks(df_master, chunk_size, temp_dir)
 
     merge_csv_files(output_dir, output_pfad)
 
