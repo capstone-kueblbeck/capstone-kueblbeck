@@ -1,6 +1,6 @@
 def read_dataframe(input_pfad):
     import pandas as pd
-    
+
     if input_pfad.endswith('csv') or input_pfad.endswith('txt'):
         with open(input_pfad, 'r') as file:
             first_line = file.readline()
@@ -20,35 +20,12 @@ def read_dataframe(input_pfad):
     df_input = df_input.drop(df_input.index[0])
     return df_input
     
-
 def setup(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad):
     # Import libraries/modules
     import pandas as pd
-    import sqlalchemy
-    import sql_functions as sf
 
-    # Define global variables
-    sql_config = sf.get_sql_config() # Function loads credentials from a .env file and returns a dictionary with credentials
-    engine = sqlalchemy.create_engine('postgresql://user:pass@host/database', # Creates a connection object called engine
-                                    connect_args=sql_config)
-    schema = 'capstone_kueblbeck' # Schema in our Postgresql database
+    # General settings
     global df_master
-
-    # Other settings
-    pd.options.display.float_format = "{:,.2f}".format
-
-    # sql_query = f'select * from {schema}.lieferanten'
-    # df_lieferanten = sf.get_dataframe(sql_query)
-
-    # #Loading static dataframe from Inputs
-    # df_lieferanten = pd.read_excel('inputs/Lieferantenübersicht.xlsx', dtype=str)
-    # df_lieferanten = df_lieferanten.drop(df_lieferanten.index[0])
-
-    # #Loading Dataframes from Uploads
-    # df_lagerbestand = pd.read_csv(lagerbestand_pfad, dtype=str, delimiter=',')
-    # df_lagerbestand = df_lagerbestand.drop(df_lagerbestand.index[0])
-    # df_verkaeufe = pd.read_csv(verkaeufe_pfad, dtype=str, delimiter=';')
-    # df_verkaeufe = df_verkaeufe.drop(df_verkaeufe.index[0])
 
     # Loading Dataframes via function
     df_lieferanten = read_dataframe(lieferanten_pfad)
@@ -167,3 +144,144 @@ def setup(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad):
     df_master = df_master.reindex(columns = new_column_order)
     
     return df_master
+
+def visuals():
+    # Import libraries/modules
+    import os
+    import sys
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import numpy as np
+    
+    # BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    # OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
+
+    # Visualization quality stock
+    locations = {'gesamt': 'Gesamt', 
+             'wen': 'Weiden', 
+             'rgb': 'Regensburg', 
+             'amb': 'Amberg', 
+             'cha': 'Cham', 
+             'str': 'Straubing', 
+             'pas': 'Passau', 
+             'lan': 'Landshut', 
+             'müh': 'Mühldorf', 
+             'ros': 'Rosenheim'}
+
+    PE_categories = ['In stock, 4+ sales', 'In stock, 3 sales', 'In stock, 2 sales', 'In stock, 1 sale', 'In stock, 0 sales']
+    display_order_quality = PE_categories
+
+    for x in locations.keys():
+        PE_condition = [
+            (df_master[x+'_lager'] > 0) & (df_master[x+'_vk'] > 3),
+            (df_master[x+'_lager'] > 0) & (df_master[x+'_vk'] == 3),
+            (df_master[x+'_lager'] > 0) & (df_master[x+'_vk'] == 2),
+            (df_master[x+'_lager'] > 0) & (df_master[x+'_vk'] == 1),
+            (df_master[x+'_lager'] > 0) & (df_master[x+'_vk'] == 0)   
+        ]
+
+        df_master[x+'_quality'] = np.select(PE_condition, PE_categories)
+
+    fig1, axes = plt.subplots(4, 3, figsize=(25,20))
+    fig1.suptitle('Warehouse management quality stock', fontweight='bold', fontsize=30)
+    fig1.tight_layout(pad=5.0)
+
+    for i in range (13):
+        y = 0
+        z = 1
+
+        for key, value in locations.items():
+
+                
+            location = df_master.query(key + '_quality != "0"')
+
+            sub = sns.countplot(ax=axes[y, z], x=key + '_quality', data=location, order=display_order_quality)
+            axes[y, z].set_title("Qualität " + value, fontsize=15.0)
+            axes[y, z].set_xlabel('Qualität', fontsize=10.0)
+            axes[y, z].set_ylabel('Anzahl', fontsize=10.0)
+            # Erhalten Sie die Gesamtzahl der Qualitätsspalte
+            total = location[key + '_quality'].count()
+
+            freq_series = location[key + '_quality'].value_counts()
+            freq_series = freq_series.reindex(display_order_quality)
+
+            rects = sub.patches
+            labels = [f'{(x/total)*100:.1f}%' for x in freq_series]
+            for rect, label in zip(rects, labels):
+                height = rect.get_height()
+                axes[y, z].text(rect.get_x() + rect.get_width() / 2, height + 5, label,
+                        ha='center', va='bottom')
+                
+            z += 1  
+            if y == 0 and z == 2:
+                y = 1
+                z = 0
+                
+            elif z >= 3:
+                y += 1
+                z = 0
+
+    vis_path_1 = 'output/stock_quality.png'
+    fig1.savefig(vis_path_1)
+
+
+    # Visualization quality sales
+    PE_categories = ['4+ sales, in stock', '4+ sales, no stock', '1-3 sales, in stock', '1-3 sales, no stock', '0 sales, in stock']
+    display_order_quality = PE_categories
+
+    for x in locations.keys():
+        PE_condition = [
+            (df_master[x+'_lager'] > 0) & (df_master[x+'_vk'] > 3),
+            (df_master[x+'_lager'] == 0) & (df_master[x+'_vk'] > 3),
+            (df_master[x+'_lager'] > 0) & (df_master[x+'_vk'] < 3) & (df_master[x+'_vk'] > 0),
+            (df_master[x+'_lager'] == 0) & (df_master[x+'_vk'] < 3) & (df_master[x+'_vk'] > 0),
+            (df_master[x+'_lager'] > 0) & (df_master[x+'_vk'] == 0)
+        ]
+
+        df_master[x+'_quality'] = np.select(PE_condition, PE_categories)
+
+    fig2, axes = plt.subplots(4, 3, figsize=(25,20))
+    fig2.suptitle('Warehouse management quality sales', fontweight='bold', fontsize=30)
+    fig2.tight_layout(pad=5.0)
+
+    for i in range (13):
+        y = 0
+        z = 1
+
+        for key, value in locations.items():
+
+                
+            location = df_master.query(key + '_quality != "0"').reset_index()
+
+            sub = sns.countplot(ax=axes[y, z], x=key + '_quality', data=location, order=display_order_quality)
+            axes[y, z].set_title("Qualität " + value, fontsize=15.0)
+            axes[y, z].set_xlabel('Qualität', fontsize=10.0)
+            axes[y, z].set_ylabel('Anzahl', fontsize=10.0)
+            # Erhalten Sie die Gesamtzahl der Qualitätsspalte
+            total = location[key + '_quality'].count()
+
+            freq_series = location[key + '_quality'].value_counts()
+            freq_series = freq_series.reindex(display_order_quality)
+
+            rects = sub.patches
+            labels = [f'{(x/total)*100:.1f}%' for x in freq_series]
+            for rect, label in zip(rects, labels):
+                height = rect.get_height()
+                axes[y, z].text(rect.get_x() + rect.get_width() / 2, height + 5, label,
+                        ha='center', va='bottom')
+                
+            z += 1  
+            if y == 0 and z == 2:
+                y = 1
+                z = 0
+                
+            elif z >= 3:
+                y += 1
+                z = 0
+
+    vis_path_2 = 'output/sales_quality.png'
+    fig2.savefig(vis_path_2)
+
+    return [vis_path_1, vis_path_2]
