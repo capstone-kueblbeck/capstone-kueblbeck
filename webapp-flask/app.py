@@ -13,6 +13,7 @@ app = Flask(__name__)
 BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
 UPLOADS_DIR = os.path.join(BASE_DIR, 'uploads')
 OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
+INPUT_DIR = os.path.join(BASE_DIR, 'inputs')
 
 # UPLOADS_DIR = os.path.abspath('uploads')
 # OUTPUT_DIR = os.path.abspath('output')
@@ -75,7 +76,7 @@ def home():
             if allowed_file(lagerbestand.filename) and allowed_file(verkaeufe.filename):
                 lagerbestand_pfad = os.path.join(UPLOADS_DIR, 'lagerbestand.csv')
                 verkaeufe_pfad = os.path.join(UPLOADS_DIR, 'verkaeufe.csv')
-                lieferanten_pfad = 'inputs/Lieferantenübersicht.xlsx'
+                lieferanten_pfad = os.path.join(INPUT_DIR, 'Lieferantenübersicht.xlsx')
 
                 lagerbestand.save(lagerbestand_pfad)
                 verkaeufe.save(verkaeufe_pfad)
