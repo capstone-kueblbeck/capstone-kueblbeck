@@ -222,9 +222,6 @@ def visuals():
                 y += 1
                 z = 0
 
-    # vis_path_1 = 'output/stock_quality.png'
-    # fig1.savefig(vis_path_1)
-
     image_bytes1 = BytesIO()
     fig1.savefig(image_bytes1, format='png')
     image_bytes1.seek(0)
@@ -284,9 +281,6 @@ def visuals():
             elif z >= 3:
                 y += 1
                 z = 0
-
-    # vis_path_2 = 'output/sales_quality.png'
-    # fig2.savefig(vis_path_2)
 
     image_bytes2 = BytesIO()
     fig2.savefig(image_bytes2, format='png')

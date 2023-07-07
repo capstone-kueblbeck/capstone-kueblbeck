@@ -3,9 +3,10 @@
         function checkInputs() {
             const lagerbestandInput = document.getElementById('lagerbestand-input');
             const verkaeufeInput = document.getElementById('verkaeufe-input');
+            const lieferantenInput = document.getElementById('lieferanten-input');
             const submitBtn = document.getElementById('submit-btn');
             
-            if (lagerbestandInput.files.length > 0 && verkaeufeInput.files.length > 0) {
+            if (lagerbestandInput.files.length > 0 && verkaeufeInput.files.length > 0 && lieferantenInput.files.length > 0) {
                 submitBtn.disabled = false;
             } else {
                 submitBtn.disabled = true;
