@@ -11,7 +11,7 @@ import math
 import webview
 
 app = Flask(__name__)
-window = webview.create_window('Küblbeck Umlagerungen', app, fullscreen=True, confirm_close=True) # create webview by opening window
+window = webview.create_window('Küblbeck Umlagerungen', app, fullscreen=False, confirm_close=True) # create webview by opening window
 
 # BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -115,11 +115,11 @@ def download():
     # df_master.to_excel(output_pfad, index=False, engine='xlsxwriter')
 
     chunk_size = 50000
-    output_dir = 'output/temp'
-    os.makedirs(output_dir, exist_ok=True)
-    save_df_chunks(df_master, chunk_size, output_dir)
+    temp_dir = os.path.join(OUTPUT_DIR, 'temp')
+    os.makedirs(temp_dir, exist_ok=True)
+    save_df_chunks(df_master, chunk_size, temp_dir)
 
-    merge_csv_files(output_dir, output_pfad)
+    merge_csv_files(temp_dir, output_pfad)
 
     return send_file(output_pfad, as_attachment=True)
 
