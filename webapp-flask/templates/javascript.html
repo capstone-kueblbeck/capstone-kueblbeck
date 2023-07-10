@@ -17,4 +17,11 @@
             input.addEventListener('change', checkInputs);
         });
     });
+
+    const toggleButton = document.querySelector('.toggle-button');
+    const userGuide = document.querySelector('.user-guide');
+
+    toggleButton.addEventListener('click', function() {
+        userGuide.classList.toggle('open');
+    });
 </script>
