@@ -1,6 +1,12 @@
-def read_dataframe(input_pfad):
-    import pandas as pd
+# Importing modules/libraries globally:
+import pandas as pd
+import os
+import sys
+import numpy as np
+import re
+import math
 
+def read_dataframe(input_pfad):
     if input_pfad.endswith('.csv') or input_pfad.endswith('.txt'):
         with open(input_pfad, 'r') as file:
             first_line = file.readline()
@@ -21,9 +27,6 @@ def read_dataframe(input_pfad):
     return df_input
     
 def setup(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad):
-    # Import libraries/modules
-    import pandas as pd
-
     # General settings
     global df_master
 
@@ -146,18 +149,16 @@ def setup(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad):
     return df_master
 
 def visuals():
-    # Import libraries/modules
-    import os
-    import sys
+    # Import specific libraries/modules
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     import seaborn as sns
-    import numpy as np
     from io import BytesIO
     import base64
 
     # Visualization quality stock
+    global locations
     locations = {'gesamt': 'Gesamt', 
              'wen': 'Weiden', 
              'rgb': 'Regensburg', 
@@ -288,3 +289,126 @@ def visuals():
     sales_quality = base64.b64encode(image_bytes2.getvalue()).decode('utf-8')
 
     return stock_quality, sales_quality
+
+def distribution_prep():
+    df_master_quality = df_master.query('gesamt_quality != "0"')
+
+    locations = {'wen': 'Weiden', 
+             'rgb': 'Regensburg', 
+             'amb': 'Amberg', 
+             'cha': 'Cham', 
+             'str': 'Straubing', 
+             'pas': 'Passau', 
+             'lan': 'Landshut', 
+             'müh': 'Mühldorf', 
+             'ros': 'Rosenheim'}
+
+    PE_categories = ['4+ sales, in stock', '4+ sales, no stock', '1-3 sales, in stock', '1-3 sales, no stock', '0 sales, in stock']
+    #display_order_quality = PE_categories
+
+    for x in locations.keys():
+        PE_condition = [
+            (df_master[x+'_lager'] > 0) & (df_master[x+'_vk'] > 3),
+            (df_master[x+'_lager'] == 0) & (df_master[x+'_vk'] > 3),
+            (df_master[x+'_lager'] > 0) & (df_master[x+'_vk'] < 3) & (df_master[x+'_vk'] > 0),
+            (df_master[x+'_lager'] == 0) & (df_master[x+'_vk'] < 3) & (df_master[x+'_vk'] > 0),
+            (df_master[x+'_lager'] > 0) & (df_master[x+'_vk'] == 0)
+        ]
+
+        df_master[x+'_quality'] = np.select(PE_condition, PE_categories)
+
+    for key, value in locations.items():
+        df_master_quality['take_from_' + key] = df_master_quality.apply(lambda row: ', '.join([k for k, v in locations.items() if row[k + '_quality'] == '4+ sales, no stock']) if row[key + '_quality'] in ['1-3 sales, in stock', '0 sales, in stock'] else '-', axis=1)
+
+    global df_master_quality_final
+    df_master_quality_final = df_master_quality[~(df_master_quality.filter(like='take_from_').isin(['-', ''])).all(axis=1)]
+    
+    return df_master_quality_final
+
+def count_list_elements(x):
+    if x == ['-']:
+        return 0
+    else:
+        return len(x)
+    
+def assigning(row):
+    a = row['list']
+    b = row['dividing']
+    c = row['remainder']
+    d = row['best_sales']
+    result = [f"{x} ({b + c:.0f})" if x == d else f"{x} ({b:.0f})" for x in a]
+    return result
+
+def best_sale(row):
+    a = row['list']
+    if not a:  # Überprüfen, ob a leer ist
+        return '-'
+    else:
+        best_sales = sorted([row[k + '_vk'] for k in a if k != '-' and k + '_vk' in row.index and row[k + '_vk'] is not None], key=lambda y: float(y) if isinstance(y, str) else y, reverse=True)
+        if best_sales:
+            return best_sales[0]
+        else:
+            return '-'
+        
+def calculate_stock(row):
+    total_stock = 0
+    pattern = r'\(\d+\)'
+    for key in locations.keys():
+        if isinstance(row['take_from_' + key], str) and row['take_from_' + key] != '-':
+            matches = re.findall(pattern, row['take_from_' + key])
+            for match in matches:
+                stock = int(match[1:-1])
+                total_stock += stock
+    total_stock *= row['basispreis']
+    return total_stock
+
+def renaming(row, key):
+    pattern = '|'.join(locations.keys())
+    a = row['take_from_' + key]
+    p = pattern
+    res = re.sub(pattern, lambda match: locations[match.group(0)], a)
+    return res
+
+def formating(row, key):
+    a = row['take_from_' + key]
+    res_blank = a.replace(',', ',\n')
+    #res_double = a.replace(') (', ',)""')
+    return res_blank
+
+def distribution():
+    for key, value in locations.items():
+        df_master_quality_final['list'] = df_master_quality_final['take_from_' + key].apply(lambda x: [i for i in x.split(', ')])
+        df_master_quality_final['numbers'] = df_master_quality_final['list'].apply(count_list_elements)
+        df_master_quality_final['dividing'] = (df_master_quality_final[key +'_lager']/df_master_quality_final['numbers']).apply(np.floor)
+        df_master_quality_final['remainder'] = (df_master_quality_final[key + '_lager']%df_master_quality_final['numbers'])
+        df_master_quality_final['best_sales'] = df_master_quality_final.apply(best_sale, axis=1)
+        df_master_quality_final['locations'] = df_master_quality_final.apply(assigning, axis=1)
+        df_master_quality_final['locations'] = [','.join(map(str, l)) for l in df_master_quality_final['locations']]
+        df_master_quality_final['locations'] = df_master_quality_final['locations'].replace(["- (nan)", "- (inf)", "- (-inf)"], "-")
+        df_master_quality_final['take_from_' + key] = df_master_quality_final['locations']
+        df_master_quality_final['take_from_' + key] = df_master_quality_final.apply(renaming, axis=1, key=key)
+        df_master_quality_final['take_from_' + key] = df_master_quality_final.apply(formating, axis=1, key=key)
+        df_master_quality_final['stock'] = df_master_quality_final.apply(calculate_stock, axis=1)
+    
+    return df_master_quality_final
+
+def keep_cols(DataFrame, keep_these):
+    """Keep only the columns [keep_these] in a DataFrame, delete
+    all other columns. 
+    """
+    drop_these = list(set(list(DataFrame)) - set(keep_these))
+
+    return DataFrame.drop(drop_these, axis = 1)
+
+def final_output():
+    take_from = ['lieferant', 'artnr', 'beschreibung']
+    for key in locations.keys():
+        a = f'take_from_{key}'
+        take_from.append(a)
+
+    df_master_quality_final.sort_values(by='stock', ascending=False, inplace=True)
+    df_master_quality_final.reset_index(inplace=True, drop=True)
+    global df_master_quality_output
+    df_master_quality_output = df_master_quality_final.pipe(keep_cols, take_from)
+
+    return df_master_quality_output
