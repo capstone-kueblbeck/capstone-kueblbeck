@@ -1,5 +1,6 @@
 # Analysis of wear parts inventory of Auto Küblbeck
 
+
 ## Projects Title 
 Analysis of wear parts inventory of Auto Küblbeck
 <br></br>
@@ -20,7 +21,7 @@ Indicators for an exchange are the number of stored products per location, the c
 In a second step, these data analyses are to be made available to the Küblbeck company in a dashboard or python script which can continue to be used and expanded internally even after the project has been completed.
 <br></br>
 
-## Project Methodology 
+## Project Methodology
 
 <ol>Initial definition of stakeholder requirements</ol>
 <ol>Data collection (in txt, csv and Excel formats) via the stakeholder's ftp server
