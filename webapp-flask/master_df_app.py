@@ -158,7 +158,7 @@ def visuals():
     import base64
 
     # Visualization quality stock
-    global locations
+    #global locations
     locations = {'gesamt': 'Gesamt', 
              'wen': 'Weiden', 
              'rgb': 'Regensburg', 
@@ -341,16 +341,15 @@ def assigning(row):
 
 def best_sale(row):
     a = row['list']
-    if not a:  # Überprüfen, ob a leer ist
+    if a == ['-']:
         return '-'
     else:
-        best_sales = sorted([row[k + '_vk'] for k in a if k != '-' and k + '_vk' in row.index and row[k + '_vk'] is not None], key=lambda y: float(y) if isinstance(y, str) else y, reverse=True)
-        if best_sales:
-            return best_sales[0]
-        else:
-            return '-'
+        best_sales = sorted([row[k + '_vk'] for k in row['list'] if k != '-' and k + '_vk' in row.index and row[k + '_vk'] is not None], key=lambda y: float(y) if isinstance(y, str) else y, reverse=True)[0]
+        for i in row['list']:
+            if row[i + '_vk'] == best_sales:
+                return i
         
-def calculate_stock(row):
+def calculate_stock(row, locations):
     total_stock = 0
     pattern = r'\(\d+\)'
     for key in locations.keys():
@@ -359,10 +358,10 @@ def calculate_stock(row):
             for match in matches:
                 stock = int(match[1:-1])
                 total_stock += stock
-    total_stock *= row['basispreis']
+    #total_stock *= row['basispreis']
     return total_stock
 
-def renaming(row, key):
+def renaming(row, key, locations):
     pattern = '|'.join(locations.keys())
     a = row['take_from_' + key]
     p = pattern
@@ -399,16 +398,3 @@ def keep_cols(DataFrame, keep_these):
     drop_these = list(set(list(DataFrame)) - set(keep_these))
 
     return DataFrame.drop(drop_these, axis = 1)
-
-def final_output():
-    take_from = ['lieferant', 'artnr', 'beschreibung']
-    for key in locations.keys():
-        a = f'take_from_{key}'
-        take_from.append(a)
-
-    df_master_quality_final.sort_values(by='stock', ascending=False, inplace=True)
-    df_master_quality_final.reset_index(inplace=True, drop=True)
-    global df_master_quality_output
-    df_master_quality_output = df_master_quality_final.pipe(keep_cols, take_from)
-
-    return df_master_quality_output

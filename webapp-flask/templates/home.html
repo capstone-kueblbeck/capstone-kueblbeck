@@ -9,25 +9,42 @@
         {% include 'navbar.html' %}
         <div class="container">
             <h1 class="text-center mt-4 mb-4">Küblbeck Umlagerungsaufträge</h1>
-                <p class="lead">
-                Diese Web-App soll unser Schlüssel dafür sein, der Firma Küblbeck unser Python Script für Umlagerungsaufträge
-                in einer einfachen und zugänglichen Art zur Verfügung zu stellen.
-                Hoffentlich klappt das =)
+                <p class="lead">    
+                Diese Web-Applikation wurde im Rahmen des Capstone-Projekts für das Data Analytics Bootcamp 2023 der neuefische GmbH entwickelt.
+                Sie ist speziell auf die Bedürfnisse der Küblbeck GmbH & Co. KG zugeschnitten und dient dazu, die Lagerbestände der deutschen Standorte zu optimieren.
+                Durch den Einsatz von Datenanalyse und Visualisierung bietet die Applikation wertvolle Einblicke, um die Lagerverwaltung effizienter zu gestalten und so Kosten zu senken.
                 </p>
-            <h2 class="text-center"> Anleitung</h2>
-            <p class="lead">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </p>
+            <button class="toggle-button">Anleitung anzeigen</button>
+                <div class="user-guide">
+                    <h2 class="text-center"> Nutzeranleitung (Work in Progress)</h2>
+                    <p class="lead">
+                        Um die Analyse erfolgreich durchzuführen, beachten Sie bitte folgende Anweisungen:
+                        <ol class="lead">
+                        <li>Extrahieren Sie die benötigten Daten aus QlikView gemäß Ihren gewünschten Parametern. Die Daten sollten im CSV-, TXT-, XLS- oder XLSX-Format vorliegen.</li>
+                        <li>Stellen Sie sicher, dass Ihre Daten die folgenden Anforderungen erfüllen:</li>
+                            <ol>
+                                <li>Mindestens erforderliche Spalten: <br>
+                                    Lieferant, Artikelnummer, Beschreibung, Basispreis, Lagerbestand einzelner Standorte (mit "_lager" gekennzeichnet), Verkaufspreis einzelner Standorte (mit "_vk" gekennzeichnet).</li>
+                                <li>Es ist nicht erforderlich, Daten für alle Standorte hochzuladen. Bitte laden Sie nur die relevanten Standortdaten hoch.</li>
+                                <li>Die angegebenen Standorte müssen sowohl im Lagerbestand als auch in den Verkaufsdaten übereinstimmen.</li>
+                            </ol>
+                        <li>Verwenden Sie je Liste den "Choose file"-Button, um die Ursprungslisten an entsprechender Stelle einzufügen.</li>
+                        <li>Generieren Sie die Liste mit Umlagerungsvorschlägen, indem Sie auf den Button "Erstelle Liste" klicken. <br>
+                            Dieser wird erst aktiv, sobald alle drei Listen hinterlegt sind.</li>
+                        <li>Bitte haben Sie einen kurzen Moment Geduld, während die Liste erstellt wird.</li>
+                        </ol>
+                    </p>
+                    <p class="lead">
+                        Sobald der Bericht fertig ist, steht er zum Download und zur weiteren Verarbeitung bereit. Viel Erfolg!
+                    </p>
+                </div>
             <h2 class="text-center">Inputs</h2>
             <form method="POST" action="" enctype="multipart/form-data">
                 <div class="text-center row">
                     <div class="col-4">
                         <h3>Lagerbestand</h3>
                         <p>Bitte Lagerbestandsdaten hochladen:</p>
-                        <label>Select a file:</label>
+                        <label>Datei auswählen:</label>
                         <input type="file" name="lagerbestand" id="lagerbestand-input" required><br><br>
                     </div>
                     <div class="col-4">
@@ -44,7 +61,7 @@
                     </div>
                 </div>
                 <div class="text-center" style="margin-bottom: 60px;">
-                    <button type="submit" id="submit-btn" class="btn btn-primary btn-lg" disabled>Just do it!</button>
+                    <button type="submit" id="submit-btn" class="btn btn-danger btn-lg" disabled>Erstelle Liste</button>
                 </div>
             </form>            
         </div>
