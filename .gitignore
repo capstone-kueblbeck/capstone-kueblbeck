@@ -8,6 +8,7 @@ sql.py
 webapp-flask/uploads/
 webapp-flask/output/
 webapp-flask/inputs/
+webapp-flask/temp/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
