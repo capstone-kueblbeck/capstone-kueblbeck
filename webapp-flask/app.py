@@ -9,7 +9,6 @@ import webview
 import numpy as np
 import re
 import xlsxwriter
-# import threading
 
 app = Flask(__name__)
 window = webview.create_window('Küblbeck Umlagerungen', app, fullscreen=False, confirm_close=True) # create webview by opening window
@@ -26,7 +25,6 @@ if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
 ALLOWED_EXTENSIONS = {'csv', 'txt', 'xls', 'xlsx'}
-# processing_complete = False
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -124,12 +122,6 @@ def process_data(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad):
     # Write Excel file for output
     datum = datetime.date.today().strftime('%Y-%m-%d')
     output_pfad = os.path.join(OUTPUT_DIR, f'Umlagerungen {datum}.xlsx')
-    # chunk_size = 10000
-    # temp_dir = os.path.join(OUTPUT_DIR, 'temp')
-    # os.makedirs(temp_dir, exist_ok=True)
-    # save_df_chunks(df_master_quality_output, chunk_size, temp_dir)
-    # merge_csv_files(temp_dir, output_pfad)
-
     workbook = xlsxwriter.Workbook(output_pfad)
     worksheet = workbook.add_worksheet()
     header_format = workbook.add_format({'bold':True})
@@ -140,10 +132,6 @@ def process_data(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad):
     num_cols = len(df_master_quality_output.columns)
     worksheet.autofilter(0, 0, num_rows, num_cols - 1)
     workbook.close()
-
-
-    # global processing_complete
-    # processing_complete = True
 
     return None
 
@@ -165,20 +153,13 @@ def home():
                 lieferanten.save(lieferanten_pfad)
 
                 process_data(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad)
-                #threading.Thread(target=process_data, args=(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad)).start
+                # threading.Thread(target=process_data, args=(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad)).start
                 
                 return redirect(url_for('output'))
             else:
                 return 'Ungültiges Dateiformat. Erlaubte Formate sind .csv, .txt, .xls und .xlsx.'
 
     return render_template('home.html')
-
-@app.route("/loading")
-def loading():
-    if processing_complete:
-        return redirect(url_for('output'))
-    else:
-        return render_template('loading.html')
 
 @app.route("/output")
 def output():
