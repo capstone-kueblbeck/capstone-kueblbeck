@@ -29,34 +29,34 @@ ALLOWED_EXTENSIONS = {'csv', 'txt', 'xls', 'xlsx'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def save_df_chunks(df, chunk_size, output_dir):
-    num_chunks = math.ceil(len(df) / (chunk_size))
+# def save_df_chunks(df, chunk_size, output_dir):
+#     num_chunks = math.ceil(len(df) / (chunk_size))
 
-    for i in range(num_chunks):
-        start = i * chunk_size
-        end = (i + 1) * chunk_size
-        chunk = df[start:end]
+#     for i in range(num_chunks):
+#         start = i * chunk_size
+#         end = (i + 1) * chunk_size
+#         chunk = df[start:end]
 
-        temp_pfad = f'{output_dir}/output_chunk_{i}.csv'
-        chunk.to_csv(temp_pfad, index=False)
+#         temp_pfad = f'{output_dir}/output_chunk_{i}.csv'
+#         chunk.to_csv(temp_pfad, index=False)
 
-def merge_csv_files(input_dir, output_file):
-    all_data = pd.DataFrame()
+# def merge_csv_files(input_dir, output_file):
+#     all_data = pd.DataFrame()
 
-    for file_name in os.listdir(input_dir):
-        if file_name.endswith('.csv'):
-            file_path = os.path.join(input_dir, file_name)
+#     for file_name in os.listdir(input_dir):
+#         if file_name.endswith('.csv'):
+#             file_path = os.path.join(input_dir, file_name)
 
-            df_chunk = pd.read_csv(file_path)
-            all_data = all_data.append(df_chunk, ignore_index=True)
+#             df_chunk = pd.read_csv(file_path)
+#             all_data = all_data.append(df_chunk, ignore_index=True)
 
-    all_data.to_excel(output_file, index=False)
+#     all_data.to_excel(output_file, index=False)
 
-    for file_name in os.listdir(input_dir):
-        file_path = os.path.join(input_dir, file_name)
-        os.remove(file_path)
+#     for file_name in os.listdir(input_dir):
+#         file_path = os.path.join(input_dir, file_name)
+#         os.remove(file_path)
 
-    os.rmdir(input_dir)
+#     os.rmdir(input_dir)
 
 def process_data(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad):
     # Create dataframe df_master
@@ -79,7 +79,6 @@ def process_data(lagerbestand_pfad, verkaeufe_pfad, lieferanten_pfad):
              'müh': 'Mühldorf', 
              'ros': 'Rosenheim'}
     PE_categories = ['4+ sales, in stock', '4+ sales, no stock', '1-3 sales, in stock', '1-3 sales, no stock', '0 sales, in stock']
-    display_order_quality = PE_categories
     for x in locations.keys():
         PE_condition = [
             (df_master[x+'_lager'] > 0) & (df_master[x+'_vk'] > 3),
