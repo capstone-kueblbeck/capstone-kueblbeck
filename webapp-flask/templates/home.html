@@ -9,25 +9,40 @@
         {% include 'navbar.html' %}
         <div class="container">
             <h1 class="text-center mt-4 mb-4">Küblbeck Umlagerungsaufträge</h1>
-                <p class="lead">
-                Diese Web-App soll unser Schlüssel dafür sein, der Firma Küblbeck unser Python Script für Umlagerungsaufträge
-                in einer einfachen und zugänglichen Art zur Verfügung zu stellen.
-                Hoffentlich klappt das =)
+                <p class="lead">    
+                Diese Web-Applikation wurde im Rahmen des Capstone-Projekts für das Data Analytics Bootcamp 2023 der neuefische GmbH entwickelt.
+                Sie ist speziell auf die Bedürfnisse der Küblbeck GmbH & Co. KG zugeschnitten und dient dazu, die Lagerbestände der deutschen Standorte zu optimieren.
+                Durch den Einsatz von Datenanalyse und Visualisierung bietet die Applikation wertvolle Einblicke, um die Lagerverwaltung effizienter zu gestalten und so Kosten zu senken.
                 </p>
-            <h2 class="text-center"> Anleitung</h2>
-            <p class="lead">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </p>
+            <button class="toggle-button">Anleitung anzeigen</button>
+                <div class="user-guide">
+                    <h2 class="text-center"> Anleitung Umlagerungstool Küblbeck</h2>
+                    <p class="lead">
+                        Um die Analyse erfolgreich durchzuführen, nutzen Sie bitte die folgende Anleitung. Sollten unerwartete Probleme oder Fragen auftreten, klicken Sie einfach auf den Schriftzug "Capstone Küblbeck" unten rechts für einen Link zu unserem GitHub Repository. In dem dortigen README finden Sie neben weiteren Informationen zum Projekt auch die LinkedIn Kontaktdaten unseres Teams. Melden Sie sich gerne bei uns!
+                        <ol class="lead">
+                        <li>Exportieren Sie die Daten zum Lagerbestand, den Verkäufen und die Lieferantenübersicht aus Qlikview oder ggf. anderen Quellen. Optimalerweise speichern Sie die Tabelleneinstellungen und passen jeweils nur die zu untersuchenden Zeiträume an (Tag des Lagerbestands und Verkaufszeitraum).</li>
+                        <li>Bevor Sie die Tabellen hochladen, stellen Sie bitte sicher, dass die folgenden Anforderungen erfüllt sind:</li>
+                            <ol>
+                                <li>Daten liegen in einem der folgenden Formate vor: .xls, .xlsx, .csv oder .txt.</li>
+                                <li>Zur Zeit ist die Auswertung nur möglich für die neun deutschen Standorte.</li>
+                                <li>Für die einzelnen Tabellen müssen die folgenden Spalten mit genau diesen Bezeichnungen gegeben sein:</li>
+                                        Lagerbestand: TBD<br>
+                                        Verkäufe: TBD<br>
+                                        Lieferanten: TBD<br>
+                            </ol>
+                        <li>Verwenden Sie zur Auswahl der entsprechenden Dateien einfach den "Choose file" Button oder ziehen die Datei direkt auf den Button.</li>
+                        <li>Nachdem alle drei Dateien ausgewählt wurden, können Sie über den Button "Erstelle Liste" die Vorschlagsliste für Umlagerungen erstellen lassen. Bitte haben Sie einen Moment Geduld, während der Prozess im Hintergrund durchgeführt wird.</li>
+                        <li>Sobald die Liste erstellt wurde, öffnet sich eine neue Seite mit zusätzlichen Visualisierungen zur Übersicht sowie einem Button, um die fertige Vorschlagsliste herunterzuladen. Die Liste ist im .xslx Format und ist problemlos mit der aktuellen Version von Excel zu nutzen.</li>
+                        </ol>
+                    </p>
+                </div>
             <h2 class="text-center">Inputs</h2>
             <form method="POST" action="" enctype="multipart/form-data">
                 <div class="text-center row">
                     <div class="col-4">
                         <h3>Lagerbestand</h3>
                         <p>Bitte Lagerbestandsdaten hochladen:</p>
-                        <label>Select a file:</label>
+                        <label>Datei auswählen:</label>
                         <input type="file" name="lagerbestand" id="lagerbestand-input" required><br><br>
                     </div>
                     <div class="col-4">
@@ -44,7 +59,7 @@
                     </div>
                 </div>
                 <div class="text-center" style="margin-bottom: 60px;">
-                    <button type="submit" id="submit-btn" class="btn btn-primary btn-lg" disabled>Just do it!</button>
+                    <button type="submit" id="submit-btn" class="btn btn-danger btn-lg" disabled>Erstelle Liste</button>
                 </div>
             </form>            
         </div>
