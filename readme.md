@@ -40,7 +40,7 @@ In a second step, these data analyses are to be made available to the Küblbeck 
 
 <br></br>
 
-## Deliverberals
+## Deliverables
 
 1. Overview of amount and value of all or selected articles in in warehouses overall and/or at specific subsidiaries.
 
@@ -82,23 +82,36 @@ In a second step, these data analyses are to be made available to the Küblbeck 
 <ul>- Web application development for final customer use</ul>
 <ul>- Link web application with redistribution logic</ul></ol>
 <ol>7. Project completion
-<ul>- alidation and Documentation</ul>
+<ul>- Validation and Documentation</ul>
 <ul>- Create Capstone Presentation</ul>
 <ul>- Handover to stakeholders</ul></ol>
 
 ## Technologies
 This project is created with:
-- Python 3.10.0
-- Git 2.39.2
-- pyinstaller 5.13.0 
-- pywebview 4.2.2
-- Pandas 1.5.0
-- Numpy 1.23.5
-- Seaborn 0.12.2
-- PostgreSQL 15.2
-- Github 3.8.5
-- Asana 6.7.23
-- Google Slides
+
+- Administration/Project Management:
+    - Asana 6.7.23
+    - Git 2.39.2
+    - Github 3.8.5
+<br></br>
+- Analytics and algorithm coding:
+    - Numpy 1.23.5
+    - Pandas 1.5.0
+    - Python 3.10.0
+    - Seaborn 0.12.2
+<br></br>
+
+- Application/Web Development:
+    - Flask 2.3.2
+    - Jinja2 3.1.2
+    - pyinstaller 5.13.0
+    - pywebview 4.2.2
+    - Werkzeug 2.3.6
+<br></br>
+- Other tools:
+    - Google Slides
+    - PostgreSQL 15.2
+    - XlsxWriter 3.1.2
 <br></br>
 ## Credits
 
